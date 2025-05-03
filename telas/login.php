@@ -1,7 +1,11 @@
-<?php include '../componentes/bootstrap_refs.php'; ?>
+<!DOCTYPE html lang="pt-br">
 
-<link rel="stylesheet" href="../css/estilo_login.css">
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <?php include '../componentes/bootstrap_refs.php'; ?>
+    <link rel="stylesheet" href="../css/estilo_login.css">
 </head>
 
 <body>
