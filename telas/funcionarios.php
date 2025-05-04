@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="../css/estilo_menu.css">
     <?php include '../componentes/bootstrap_refs.php'; ?>
+    <link rel="stylesheet" href="../css/estilo_funcionarios.css">
 </head>
 
 <body>
@@ -17,8 +18,8 @@
     <div class="d-md-flex">
         <?php include '../componentes/menu.php'; ?>
 
-        <main class="container py-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+        <main class="container-fluid px-3" style="position: relative;">
+            <div class="d-flex justify-content-between align-items-center mb-4" style="padding-bottom: 15px">
                 <h1 class="h3">
                     <i></i>Funcionários
                 </h1>
@@ -27,7 +28,7 @@
                 </button>
             </div>
 
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" style="max-height: calc(100vh - 150px); overflow-y: auto; padding-right: 8px;">
                 <?php for ($i = 1; $i <= 6; $i++): ?>
                     <div class="col">
                         <div class="card shadow-sm h-100 position-relative">
@@ -169,9 +170,9 @@
     <div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-labelledby="modalConfirmarExclusaoLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="modalConfirmarExclusaoLabel">Confirmar Exclusão</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
                     Tem certeza que deseja excluir este funcionário?

@@ -13,6 +13,28 @@
         <h2 id="titulo-login">Login</h2>
         <p id="subtitulo-login">Selecione seu perfil para continuar o acesso</p>
 
+        <!-- MENSAGEM DE SUCESSO -->
+        <?php if (isset($_GET['cadastro']) && $_GET['cadastro'] === 'sucesso'): ?>
+            <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+                ✅ Cadastro realizado com sucesso! Faça login para continuar.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['erro'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                <?php
+                if ($_GET['erro'] === 'senha') {
+                    echo "Senha incorreta.";
+                } elseif ($_GET['erro'] === 'email') {
+                    echo "E-mail não encontrado.";
+                }
+                ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+            </div>
+        <?php endif; ?>
+
+
         <!-- Seleção de perfil -->
         <div id="selecao-perfil" class="row row-cols-1 row-cols-md-2 g-3">
             <div class="col">
@@ -32,7 +54,7 @@
         <!-- Formulário Admin -->
         <div id="form-admin" class="formulario-login mt-4 d-none">
 
-            <form action="login_admin.php" method="POST">
+            <form action="../logica/controladores/login_admin.php" method="POST">
                 <div class="mb-3">
                     <input type="email" name="email" class="form-control" placeholder="E-mail" required>
                 </div>
@@ -62,7 +84,7 @@
 
         <!-- Cadastro Admin -->
         <div id="form-cadastro-admin" class="formulario-login mt-4 d-none">
-            <form action="cadastrar_admin.php" method="POST">
+            <form action="../logica/controladores/cadastrar_admin.php" method="POST">
                 <div class="mb-3">
                     <input type="text" name="nome" class="form-control" placeholder="Nome completo" required>
                 </div>

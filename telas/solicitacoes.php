@@ -8,6 +8,7 @@
     <title>Solicitações - SIGTO</title>
     <link rel="stylesheet" href="../css/estilo_menu.css">
     <?php include '../componentes/bootstrap_refs.php'; ?>
+    <link rel="stylesheet" href="../css/estilo_funcionarios.css">
     <style>
         .list-group-item+.list-group-item {
             margin-top: 1rem;
@@ -22,24 +23,32 @@
         <?php include '../componentes/menu.php'; ?>
 
         <main class="container py-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4" style="padding-bottom: 15px">
                 <h1 class="h3">Solicitações de Tarefas Críticas</h1>
             </div>
 
-            <ul class="list-group">
-                <?php for ($i = 1; $i <= 5; $i++): ?>
-                    <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
-                        <div class="mb-3 mb-md-0">
-                            <div class="fw-bold">Solicitação #<?= $i ?> - Apoio com empilhadeira</div>
-                            Solicitante: Maria - Mecânica<br>
-                            Sugerido para: João - Operador
-                        </div>
-                        <div class="text-center">
-                            <button class="btn btn-primary btn-sm mt-2 mt-md-0" data-bs-toggle="modal" data-bs-target="#modalAvaliarSolicitacao">Avaliar</button>
-                        </div>
-                    </li>
-                <?php endfor; ?>
-            </ul>
+            <div style="max-height: 100vh; overflow-y: auto;" class="custom-scrollbar">
+                <ul class="list-group">
+                    <?php for ($i = 1; $i <= 8; $i++): ?>
+                        <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 p-3 shadow-sm rounded-3 mb-1 border border-light-subtle">
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold text-primary">Solicitação #<?= $i ?> - Apoio com empilhadeira</div>
+                                <small class="text-muted d-block mt-1">
+                                    <i class="bi bi-person-circle me-1"></i>Solicitante: Maria - Mecânica<br>
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>Sugerido para: João - Operador
+                                </small>
+                            </div>
+                            <div>
+                                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalAvaliarSolicitacao">
+                                    Avaliar
+                                </button>
+                            </div>
+                        </li>
+                    <?php endfor; ?>
+                </ul>
+            </div>
+
+
         </main>
     </div>
 

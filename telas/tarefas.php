@@ -31,6 +31,7 @@
                         <div class="d-flex gap-2 w-100 w-md-auto align-items-center">
                             <select class="form-select" required>
                                 <optgroup label="Operadores">
+                                    <option>Minhas tarefas</option>
                                     <option>Lucas - Operador</option>
                                     <option>Rafael - Operador</option>
                                     <option>Fernanda - Operadora</option>
@@ -69,7 +70,7 @@
 
             <!-- Lista de tarefas -->
             <div id="containerTarefas" class="row modo-grade"
-                style="max-height: calc(100vh - 150px); overflow-y: auto; padding-right: 8px;">
+                style="max-height: calc(100vh - 150px); overflow-y: auto; padding-right: 2px;">
                 <?php for ($i = 1; $i <= 6; $i++): ?>
                     <div class="col">
                         <div class="tarefa-lista d-flex justify-content-between align-items-center py-3 px-2">

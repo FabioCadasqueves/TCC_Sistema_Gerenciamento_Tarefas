@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="../css/estilo_menu.css">
     <?php include '../componentes/bootstrap_refs.php'; ?>
+    <link rel="stylesheet" href="../css/estilo_funcionarios.css">
 </head>
 
 <div class="modal fade" id="modalNovaEquipe" tabindex="-1" aria-labelledby="modalNovaEquipeLabel" aria-hidden="true">
@@ -62,10 +63,6 @@
     </div>
 </div>
 
-
-
-
-
 <body>
 
     <?php include '../componentes/botao_menu.php'; ?>
@@ -74,13 +71,13 @@
         <?php include '../componentes/menu.php'; ?>
 
         <main class="container py-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4" style="padding-bottom: 15px">
                 <h1 class="h3">Equipes</h1>
                 <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovaEquipe">+ Nova Equipe</a>
 
             </div>
 
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" style="max-height: calc(100vh - 150px); overflow-y: auto; padding-right: 8px;">
                 <?php for ($i = 1; $i <= 6; $i++): ?>
                     <div class="col">
                         <div class="card shadow-sm h-100">
