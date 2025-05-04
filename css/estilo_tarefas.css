@@ -1,0 +1,130 @@
+/* Espaçamento no topo para o conteúdo não colidir com o menu mobile */
+main {
+  padding-top: 1rem;
+}
+
+/* Destaque por criticidade */
+.card-tarefa.baixa {
+  border-left: 5px solid #198754; /* Verde */
+}
+.card-tarefa.media {
+  border-left: 5px solid #ffc107; /* Amarelo */
+}
+.card-tarefa.alta {
+  border-left: 5px solid #dc3545; /* Vermelho */
+}
+
+/* Efeito hover nos cards */
+.card-tarefa:hover {
+  transform: translateY(-3px);
+  transition: 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Ajuste nos botões de ação */
+.card-body .btn {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Estilo mais moderno para os selects */
+select.form-select {
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+/* Botão de visualização ativo */
+.btn-visualizacao.active {
+  background-color: #0d6efd;
+  color: white;
+  border-color: #0d6efd;
+}
+
+/* --- VISUALIZAÇÃO EM GRADE --- */
+.modo-grade {
+  row-gap: 1.5rem;
+}
+
+/* --- VISUALIZAÇÃO EM LISTA (ESTILO CLÁSSICO COM SEPARADOR) --- */
+.modo-lista .col {
+  max-width: 100%;
+  flex: 1 1 100%;
+}
+
+.tarefa-lista {
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.tarefa-lista:hover {
+  background-color: #f8f9fa;
+  border-color: #cbd5e1;
+}
+
+.tarefa-lista:hover {
+  background-color: #f8f9fa;
+}
+
+.tarefa-lista h6 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.tarefa-lista .badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.6em;
+}
+
+.tarefa-lista .acoes-bloco .btn {
+  height: 2rem;
+  width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 0.85rem;
+  border-radius: 0.4rem;
+}
+
+/* Separador entre tarefas */
+.modo-lista .col + .col hr {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  color: #dee2e6;
+}
+
+/* Responsividade para telas pequenas */
+@media (max-width: 576px) {
+  #containerTarefas .card-body {
+    padding: 1rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-text {
+    font-size: 0.875rem;
+  }
+}
+/* Em mobile, quebra o texto do responsável para a linha de baixo */
+@media (max-width: 576px) {
+  .responsavel-linha {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .responsavel-linha .responsavel {
+    margin-left: 0; /* remove alinhamento lateral */
+  }
+}
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}

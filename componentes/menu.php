@@ -12,30 +12,32 @@
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="#" class="nav-link active text-white">
-                <i class="bi bi-speedometer2 me-2"></i>
-                Dashboard
+            <a href="dashboard.php" class="nav-link text-white <?php if ($paginaAtual === 'dashboard') echo 'active'; ?>">
+                <i class="bi bi-speedometer2 me-2"></i> Dashboard
             </a>
         </li>
         <li>
-            <a href="#" class="nav-link text-white">
-                <i class="bi bi-people-fill me-2"></i>
-                Equipes
+            <a href="funcionarios.php" class="nav-link text-white <?php if ($paginaAtual === 'funcionarios') echo 'active'; ?>">
+                <i class="bi bi-person-badge-fill me-2"></i> Funcionários
             </a>
         </li>
         <li>
-            <a href="#" class="nav-link text-white">
-                <i class="bi bi-list-task me-2"></i>
-                Tarefas
+            <a href="equipes.php" class="nav-link text-white <?php if ($paginaAtual === 'equipes') echo 'active'; ?>">
+                <i class="bi bi-people-fill me-2"></i> Equipes
             </a>
         </li>
         <li>
-            <a href="#" class="nav-link text-white">
-                <i class="bi bi-chat-left-dots-fill me-2"></i>
-                Solicitações
+            <a href="tarefas.php" class="nav-link text-white <?php if ($paginaAtual === 'tarefas') echo 'active'; ?>">
+                <i class="bi bi-list-task me-2"></i> Tarefas
+            </a>
+        </li>
+        <li>
+            <a href="solicitacoes.php" class="nav-link text-white <?php if ($paginaAtual === 'solicitacoes') echo 'active'; ?>">
+                <i class="bi bi-chat-left-dots-fill me-2"></i> Solicitações
             </a>
         </li>
     </ul>
+
     <hr>
     <div class="dropdown">
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
