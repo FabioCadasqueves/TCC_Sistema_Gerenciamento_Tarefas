@@ -63,3 +63,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+document.querySelectorAll(".btn-editar-funcionario").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.getElementById("editarIdFuncionario").value = btn.dataset.id;
+    document.getElementById("editarNomeFuncionario").value = btn.dataset.nome;
+    document.getElementById("editarFuncaoFuncionario").value =
+      btn.dataset.funcao;
+    document.getElementById("editarPinFuncionario").value = btn.dataset.pin;
+  });
+});
+
+document.querySelectorAll(".btn-excluir-funcionario").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.getElementById("excluirIdFuncionario").value = btn.dataset.id;
+  });
+});
+
+setTimeout(() => {
+  const alert = document.getElementById("alert-overlay");
+  if (alert) {
+    const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+    bsAlert.close();
+  }
+}, 4000); // 4 segundos
