@@ -1,9 +1,13 @@
 <?php
 session_start();
-if (!isset($_SESSION['admin_id'])) {
+
+// Impede acesso se ninguém estiver logado
+if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['tipo_usuario'])) {
     header('Location: login.php');
     exit;
 }
+
+// Define página atual
 $paginaAtual = 'dashboard';
 ?>
 

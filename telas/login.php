@@ -28,6 +28,8 @@
                     echo "Senha incorreta.";
                 } elseif ($_GET['erro'] === 'email') {
                     echo "E-mail não encontrado.";
+                } elseif ($_GET['erro'] === 'pin') {
+                    echo "PIN incorreto ou colaborador inativo.";
                 }
                 ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
@@ -114,7 +116,7 @@
 
         <!-- Formulário Colaborador -->
         <div id="form-colaborador" class="formulario-login mt-4 d-none">
-            <form action="login_colaborador.php" method="POST">
+            <form action="../logica/controladores/login_funcionario.php" method="POST">
                 <div class="mb-3">
                     <input type="text" name="pin" class="form-control" placeholder="PIN de Acesso" required>
                 </div>

@@ -19,7 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Verifica a senha
         if (password_verify($senha, $senha_hash)) {
             $_SESSION['admin_id'] = $admin_id;
+            $_SESSION['usuario_id'] = $admin_id;
             $_SESSION['admin_nome'] = $admin_nome;
+            $_SESSION['tipo_usuario'] = 'admin';
             header('Location: ../../telas/dashboard.php');
             exit;
         } else {

@@ -2,10 +2,10 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once '../conexao/conexao.php';
 
-if (!isset($_SESSION['admin_id'])) {
+// Bloqueia acesso se não for admin
+if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo_usuario'] !== 'admin') {
     header('Location: login.php');
     exit;
 }
@@ -32,6 +32,7 @@ foreach ($usuarios as $usuario) {
 
 $paginaAtual = 'equipes';
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 

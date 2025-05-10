@@ -4,7 +4,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once '../conexao/conexao.php';
 
-if (!isset($_SESSION['admin_id'])) {
+// Bloqueia o acesso para quem não for admin
+if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo_usuario'] !== 'admin') {
     header('Location: login.php');
     exit;
 }

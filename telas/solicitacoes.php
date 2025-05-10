@@ -1,5 +1,13 @@
+<?php
+session_start();
+if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo_usuario'] !== 'admin') {
+    header('Location: login.php');
+    exit;
+}
+$paginaAtual = 'solicitacoes';
+?>
+
 <!DOCTYPE html>
-<?php $paginaAtual = 'solicitacoes'; ?>
 <html lang="pt-br">
 
 <head>
