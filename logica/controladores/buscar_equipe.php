@@ -30,6 +30,7 @@ while ($row = $resultMembros->fetch_assoc()) {
 
 // Retornar como JSON
 echo json_encode([
+    'id_equipe' => $equipe_id, // 👈 adicione isso
     'nome' => $equipe['nome'] ?? '',
     'membros' => $membros
 ]);

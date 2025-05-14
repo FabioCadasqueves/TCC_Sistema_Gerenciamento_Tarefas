@@ -59,11 +59,12 @@ $paginaAtual = 'funcionarios';
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" style="max-height: calc(100vh - 150px); overflow-y: auto; padding-right: 8px;">
                 <?php
                 $admin_id = $_SESSION['admin_id'];
-                $sql = "SELECT u.id, u.nome, u.funcao, u.pin, e.nome AS equipe 
+                $sql = "SELECT u.id, u.nome, u.funcao, u.pin, MAX(e.nome) AS equipe
                         FROM usuarios u 
                         LEFT JOIN membros_equipes me ON me.usuario_id = u.id 
                         LEFT JOIN equipes e ON e.id = me.equipe_id 
-                        WHERE u.admin_id = ? AND u.ativo = 1";
+                        WHERE u.admin_id = ? AND u.ativo = 1
+                        GROUP BY u.id, u.nome, u.funcao, u.pin";
 
 
                 $stmt = $conn->prepare($sql);

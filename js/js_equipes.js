@@ -6,33 +6,37 @@ document.addEventListener("DOMContentLoaded", function () {
       const botao = event.relatedTarget;
       const equipeId = botao.getAttribute("data-id");
 
-      // Preenche o campo hidden com o ID da equipe
       document.getElementById("editarIdEquipe").value = equipeId;
 
-      // Limpa e desmarca todos os checkboxes
-      document
-        .querySelectorAll('#modalEditarEquipe input[name="membros[]"]')
-        .forEach((input) => {
-          input.checked = false;
-        });
-
-      // Buscar dados da equipe via fetch
-      fetch(`../logica/controladores/buscar_equipe.php?id=${equipeId}`)
+      fetch("../logica/controladores/buscar_equipe.php?id=" + equipeId)
         .then((res) => res.json())
         .then((data) => {
           document.getElementById("editarNomeEquipe").value = data.nome;
+
           document
             .querySelectorAll('#modalEditarEquipe input[name="membros[]"]')
             .forEach((checkbox) => {
               const id = parseInt(checkbox.value, 10);
+              const equipeDoUsuario = checkbox.dataset.equipe;
+
               if (data.membros.includes(id)) {
                 checkbox.checked = true;
+                checkbox.disabled = false;
+              } else if (
+                equipeDoUsuario &&
+                equipeDoUsuario !== data.id_equipe?.toString()
+              ) {
+                checkbox.checked = false;
+                checkbox.disabled = true;
+              } else {
+                checkbox.checked = false;
+                checkbox.disabled = false;
               }
             });
         })
-        .catch((error) =>
-          console.error("Erro ao buscar dados da equipe:", error)
-        );
+        .catch((error) => {
+          console.error("Erro ao buscar dados da equipe:", error);
+        });
     });
   }
 });

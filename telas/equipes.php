@@ -12,9 +12,26 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo_usuario'] !== 'admin') {
 
 // Buscar usuários do banco
 $usuarios = [];
-$resultado = mysqli_query($conn, "SELECT id, nome, funcao FROM usuarios ORDER BY funcao, nome");
+$admin_id = $_SESSION['admin_id'];
 
-while ($linha = mysqli_fetch_assoc($resultado)) {
+$sql = "SELECT u.id, u.nome, u.funcao,
+               me.equipe_id AS equipe_atual
+        FROM usuarios u
+        LEFT JOIN (
+            SELECT usuario_id, equipe_id
+            FROM membros_equipes
+            WHERE ativo = 1
+        ) me ON me.usuario_id = u.id
+        WHERE u.ativo = 1 AND u.admin_id = ?
+        ORDER BY u.funcao, u.nome";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $admin_id);
+$stmt->execute();
+$resultado = $stmt->get_result();
+
+$usuarios = [];
+while ($linha = $resultado->fetch_assoc()) {
     $usuarios[] = $linha;
 }
 
@@ -29,6 +46,7 @@ foreach ($usuarios as $usuario) {
         $grupos[$usuario['funcao']][] = $usuario;
     }
 }
+
 
 $paginaAtual = 'equipes';
 ?>
@@ -73,11 +91,11 @@ $paginaAtual = 'equipes';
                 $admin_id = $_SESSION['admin_id'];
 
                 $sql = "SELECT e.id, e.nome, e.criado_em, COUNT(em.usuario_id) AS total_membros
-                        FROM equipes e
-                        LEFT JOIN membros_equipes em ON em.equipe_id = e.id
-                        WHERE e.admin_id = ? AND e.ativo = 1
-                        GROUP BY e.id, e.nome, e.criado_em
-                        ORDER BY e.nome";
+        FROM equipes e
+        LEFT JOIN membros_equipes em ON em.equipe_id = e.id AND em.ativo = 1
+        WHERE e.admin_id = ? AND e.ativo = 1
+        GROUP BY e.id, e.nome, e.criado_em
+        ORDER BY e.nome";
 
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("i", $admin_id);
@@ -112,7 +130,6 @@ $paginaAtual = 'equipes';
                             <div class="card-body">
                                 <h5 class="card-title"><?= htmlspecialchars($equipe['nome']) ?></h5>
                                 <p class="card-text mb-1">Membros: <?= intval($equipe['total_membros']) ?></p>
-                                <p class="card-text text-success">Status: Ativa</p>
                             </div>
                         </div>
                     </div>
@@ -139,17 +156,36 @@ $paginaAtual = 'equipes';
                         <label class="form-label">Selecione os Membros</label>
 
                         <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                            <?php
+                            $nomes_plurais = [
+                                'Operador' => 'Operadores',
+                                'Mecânico' => 'Mecânicos'
+                            ];
+                            ?>
                             <?php foreach ($grupos as $cargo => $lista): ?>
-                                <strong class="d-block mb-2 mt-3"><?= $cargo ?><?= count($lista) ? 's' : '' ?></strong>
+                                <strong class="d-block mb-2 mt-2"><?= $nomes_plurais[$cargo] ?? $cargo ?></strong>
                                 <?php foreach ($lista as $usuario): ?>
+                                    <?php
+                                    $usuario_id = $usuario['id'];
+                                    $usuario_nome = htmlspecialchars($usuario['nome']);
+                                    $usuario_equipe = $usuario['equipe_atual'] ?? null;
+                                    $desabilitado = !empty($usuario_equipe);
+                                    ?>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="membros[]" value="<?= $usuario['id'] ?>" id="usuario<?= $usuario['id'] ?>">
-                                        <label class="form-check-label" for="usuario<?= $usuario['id'] ?>">
-                                            <?= htmlspecialchars($usuario['nome']) ?>
+                                        <input class="form-check-input"
+                                            type="checkbox"
+                                            name="membros[]"
+                                            value="<?= $usuario_id ?>"
+                                            id="usuario<?= $usuario_id ?>"
+                                            <?= $desabilitado ? 'disabled' : '' ?>>
+                                        <label class="form-check-label" for="usuario<?= $usuario_id ?>">
+                                            <?= $usuario_nome ?>
+                                            <?= $desabilitado ? '<span class="text-muted">(já em uma equipe)</span>' : '' ?>
                                         </label>
                                     </div>
                                 <?php endforeach; ?>
                             <?php endforeach; ?>
+
                         </div>
 
                         <div class="form-text">Marque os funcionários que farão parte da equipe.</div>
@@ -198,17 +234,34 @@ $paginaAtual = 'equipes';
                     <div class="mb-3">
                         <label class="form-label">Editar Membros da Equipe</label>
                         <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                            <?php
+                            $nomes_plurais = [
+                                'Operador' => 'Operadores',
+                                'Mecânico' => 'Mecânicos'
+                            ];
+                            ?>
                             <?php foreach ($grupos as $cargo => $lista): ?>
-                                <strong class="d-block mb-2 mt-3"><?= $cargo ?><?= count($lista) ? 's' : '' ?></strong>
+                                <strong class="d-block mb-2 mt-2"><?= $nomes_plurais[$cargo] ?? $cargo ?></strong>
                                 <?php foreach ($lista as $usuario): ?>
+                                    <?php
+                                    $usuario_id = $usuario['id'];
+                                    $usuario_nome = htmlspecialchars($usuario['nome']);
+                                    $usuario_equipe = $usuario['equipe_atual'] ?? '';
+                                    ?>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="membros[]" value="<?= $usuario['id'] ?>" id="usuario<?= $usuario['id'] ?>">
-                                        <label class="form-check-label" for="usuario<?= $usuario['id'] ?>">
-                                            <?= htmlspecialchars($usuario['nome']) ?>
+                                        <input class="form-check-input"
+                                            type="checkbox"
+                                            name="membros[]"
+                                            value="<?= $usuario_id ?>"
+                                            id="editarUsuario<?= $usuario_id ?>"
+                                            data-equipe="<?= $usuario_equipe ?>">
+                                        <label class="form-check-label" for="editarUsuario<?= $usuario_id ?>">
+                                            <?= $usuario_nome ?>
                                         </label>
                                     </div>
                                 <?php endforeach; ?>
                             <?php endforeach; ?>
+
                         </div>
                         <div class="form-text">Desmarque para remover ou marque para adicionar membros.</div>
                     </div>
