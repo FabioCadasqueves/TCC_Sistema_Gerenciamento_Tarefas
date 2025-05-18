@@ -1,6 +1,6 @@
 console.log("✅ js_tarefas.js carregado com sucesso");
 
-// 🌐 Alternar visualização: grade <-> lista
+// Alternar visualização: grade <-> lista
 function mudarVisualizacao(modo, botao) {
   const container = document.getElementById("containerTarefas");
   if (!container) return;
@@ -23,7 +23,7 @@ function mudarVisualizacao(modo, botao) {
   }
 }
 
-// 🔄 Aplicar modo lista automaticamente em telas pequenas
+// Aplicar modo lista automaticamente em telas pequenas
 window.addEventListener("resize", () => {
   const container = document.getElementById("containerTarefas");
   if (!container) return;
@@ -34,7 +34,7 @@ window.addEventListener("resize", () => {
   }
 });
 
-// 🚀 Ao carregar a página
+// Ao carregar a página
 document.addEventListener("DOMContentLoaded", () => {
   // Auto modo lista no mobile
   if (window.innerWidth < 768) {
@@ -91,8 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
 document
   .getElementById("filtroResponsavel")
   .addEventListener("change", function () {
-    const selectedId = this.value;
-    window.location.href = `tarefas.php?usuario_id=${selectedId}`;
+    const selectedValue = this.value;
+    window.location.href = `tarefas.php?usuario_id=${selectedValue}`;
   });
 
 function alterarStatus(idTarefa, novoStatus) {

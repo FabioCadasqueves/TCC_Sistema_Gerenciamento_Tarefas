@@ -14,7 +14,16 @@ $usuario_id = $_SESSION['usuario_id'];
 $tipo_usuario = $_SESSION['tipo_usuario'];
 $paginaAtual = 'tarefas';
 
-$filtro_usuario_id = $_GET['usuario_id'] ?? 'meus';
+
+$filtro_usuario_id = $_GET['usuario_id']
+    ?? (
+        $_SESSION['tipo_usuario'] === 'admin'
+        ? 'admin_' . $_SESSION['usuario_id']
+        : 'funcionario_' . $_SESSION['usuario_id']
+    );
+
+
+list($filtro_tipo, $filtro_id) = explode('_', $filtro_usuario_id);
 
 // Consulta tarefas filtradas, ordenadas por criticidade personalizada
 $ordenacaoCriticidade = "
@@ -24,24 +33,17 @@ $ordenacaoCriticidade = "
         WHEN 'Baixa' THEN 3
     END ASC";
 
-if ($filtro_usuario_id === 'meus') {
-    $sql = "SELECT t.*, u.nome AS responsavel_nome
-            FROM tarefas t
-            INNER JOIN usuarios u ON u.id = t.atribuido_para
-            WHERE t.atribuido_para = ?
-            ORDER BY $ordenacaoCriticidade, t.criado_em DESC";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $usuario_id);
-} else {
-    $sql = "SELECT t.*, u.nome AS responsavel_nome
-            FROM tarefas t
-            INNER JOIN usuarios u ON u.id = t.atribuido_para
-            WHERE t.atribuido_para = ?
-            ORDER BY $ordenacaoCriticidade, t.criado_em DESC";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $filtro_usuario_id);
-}
 
+$sql = "SELECT t.*, 
+            u.nome AS usuario_nome, 
+            a.nome AS admin_nome
+        FROM tarefas t
+        LEFT JOIN usuarios u ON u.id = t.atribuido_para AND t.atribuido_para_tipo = 'funcionario'
+        LEFT JOIN admins a  ON a.id = t.atribuido_para AND t.atribuido_para_tipo = 'admin'
+        WHERE t.atribuido_para = ? AND t.atribuido_para_tipo = ?
+        ORDER BY $ordenacaoCriticidade, t.criado_em DESC";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("is", $filtro_id, $filtro_tipo);
 $stmt->execute();
 $resultado = $stmt->get_result();
 
@@ -100,23 +102,25 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
                         </div>
                         <div class="d-flex gap-2 w-100 w-md-auto align-items-center">
                             <select class="form-select" id="filtroResponsavel">
-                                <option value="meus" <?= ($filtro_usuario_id === 'meus') ? 'selected' : '' ?>>Minhas tarefas</option>
+                                <option value="<?= $tipo_usuario === 'admin' ? 'admin' : 'funcionario' ?>_<?= $usuario_id ?>" <?= ($filtro_usuario_id == ($tipo_usuario === 'admin' ? 'admin' : 'funcionario') . '_' . $usuario_id) ? 'selected' : '' ?>>Minhas tarefas</option>
                                 <?php foreach ($usuariosPorFuncao as $funcao => $usuarios): ?>
                                     <optgroup label="<?= htmlspecialchars($funcao) ?>">
                                         <?php foreach ($usuarios as $u): ?>
-                                            <option value="<?= $u['id'] ?>" <?= ($filtro_usuario_id == $u['id']) ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars($u['nome']) ?> - <?= htmlspecialchars($u['funcao']) ?>
-                                            </option>
+                                            <?php if ($u['id'] == $_SESSION['usuario_id']) continue; ?>
+                                            <option value="funcionario_<?= $u['id'] ?>" <?= ($filtro_usuario_id == 'funcionario_' . $u['id']) ? 'selected' : '' ?>><?= htmlspecialchars($u['nome']) ?></option>
                                         <?php endforeach; ?>
                                     </optgroup>
                                 <?php endforeach; ?>
                             </select>
 
+
+                            <!-- Botão Adicionar Tarefa permanece igual -->
                             <button class="btn btn-primary d-flex align-items-center gap-2" style="height: 40px;"
                                 data-bs-toggle="modal" data-bs-target="#modalAdicionarTarefa" title="Adicionar Tarefa">
                                 <i class="bi bi-plus-circle fs-4"></i>
                             </button>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -138,7 +142,10 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
                                 <h6 class="mb-1 fw-semibold"><?= htmlspecialchars($tarefa['descricao']) ?></h6>
                                 <div class="small text-muted responsavel-linha">
                                     <span>Criticidade: <strong><?= $tarefa['criticidade'] ?></strong></span>
-                                    <span class="responsavel">Responsável: <?= $tarefa['responsavel_nome'] ?></span>
+                                    <span class="responsavel">
+                                        Responsável: <?= htmlspecialchars($tarefa['usuario_nome'] ?? $tarefa['admin_nome'] ?? 'Não encontrado') ?>
+                                    </span>
+
                                 </div>
                                 <div class="small mt-1">
                                     Status: <span class="badge bg-secondary"><?= $tarefa['status'] ?></span>
@@ -188,7 +195,7 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $admin_id);
     $stmt->execute();
-    $resultado = $stmt->get_result();
+    $resultadoUsuariosForm = $stmt->get_result();
     $ultimoCargo = '';
     ?>
 
@@ -196,6 +203,9 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
     <div class="modal fade" id="modalAdicionarTarefa" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <form class="modal-content" method="POST" action="../logica/controladores/adicionar_tarefa.php">
+
+                <input type="hidden" name="tipo_usuario_logado" value="<?= $_SESSION['tipo_usuario'] ?>">
+
                 <div class="modal-header">
                     <h5 class="modal-title">Nova Tarefa</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -211,13 +221,11 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
                         <select class="form-select"
                             id="responsavel_id"
                             name="responsavel_id"
-                            required
-                            data-user-logado="<?= $usuario_logado_id ?>"
-                            data-tipo-usuario="<?= $_SESSION['tipo_usuario'] ?>">
+                            required>
                             <option value="">Selecione o responsável</option>
-                            <option value="<?= $usuario_logado_id ?>">Eu mesmo</option>
-                            <?php while ($usuario = mysqli_fetch_assoc($resultado)): ?>
-                                <?php if ($usuario['id'] == $usuario_logado_id) continue; ?>
+                            <option value="<?= $_SESSION['tipo_usuario'] ?>_<?= $_SESSION['usuario_id'] ?>">Eu mesmo</option>
+                            <?php while ($usuario = mysqli_fetch_assoc($resultadoUsuariosForm)): ?>
+                                <?php if ($usuario['id'] == $_SESSION['usuario_id']) continue; ?>
                                 <?php if ($ultimoCargo !== $usuario['funcao']): ?>
                                     <?php
                                     if ($ultimoCargo !== '') echo '</optgroup>';
@@ -225,10 +233,11 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
                                     ?>
                                     <optgroup label="<?= htmlspecialchars($usuario['funcao']) ?>">
                                     <?php endif; ?>
-                                    <option value="<?= $usuario['id'] ?>"><?= htmlspecialchars($usuario['nome']) ?></option>
+                                    <option value="funcionario_<?= $usuario['id'] ?>"><?= htmlspecialchars($usuario['nome']) ?></option>
                                 <?php endwhile; ?>
                                 <?php if ($ultimoCargo !== '') echo '</optgroup>'; ?>
                         </select>
+
                     </div>
 
                     <div class="mb-3">
@@ -265,11 +274,13 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
     $sql = "SELECT id, nome, funcao FROM usuarios 
         WHERE admin_id = ? AND ativo = 1
         ORDER BY funcao, nome";
+    // Consulta nova só para o formulário de editar tarefa
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $admin_id);
     $stmt->execute();
-    $resultado = $stmt->get_result();
+    $resultadoUsuariosEdit = $stmt->get_result();
     $ultimoCargo = '';
+
     ?>
 
     <!-- Modal Editar Tarefa -->
@@ -290,11 +301,14 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
 
                     <div class="mb-3">
                         <label class="form-label">Responsável</label>
-                        <select class="form-select" name="responsavel_id" id="editar_responsavel_id" required>
+                        <select class="form-select"
+                            name="responsavel_id"
+                            id="editar_responsavel_id"
+                            required>
                             <option value="">Selecione o responsável</option>
-                            <option value="<?= $usuario_logado_id ?>">Eu mesmo</option>
-                            <?php while ($usuario = mysqli_fetch_assoc($resultado)): ?>
-                                <?php if ($usuario['id'] == $usuario_logado_id) continue; ?>
+                            <option value="<?= $_SESSION['tipo_usuario'] ?>_<?= $_SESSION['usuario_id'] ?>">Eu mesmo</option>
+                            <?php while ($usuario = mysqli_fetch_assoc($resultadoUsuariosEdit)): ?>
+                                <?php if ($usuario['id'] == $_SESSION['usuario_id']) continue; ?>
                                 <?php if ($ultimoCargo !== $usuario['funcao']): ?>
                                     <?php
                                     if ($ultimoCargo !== '') echo '</optgroup>';
@@ -302,10 +316,11 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
                                     ?>
                                     <optgroup label="<?= htmlspecialchars($usuario['funcao']) ?>">
                                     <?php endif; ?>
-                                    <option value="<?= $usuario['id'] ?>"><?= htmlspecialchars($usuario['nome']) ?></option>
+                                    <option value="funcionario_<?= $usuario['id'] ?>"><?= htmlspecialchars($usuario['nome']) ?></option>
                                 <?php endwhile; ?>
                                 <?php if ($ultimoCargo !== '') echo '</optgroup>'; ?>
                         </select>
+
                     </div>
 
                     <div class="mb-3">

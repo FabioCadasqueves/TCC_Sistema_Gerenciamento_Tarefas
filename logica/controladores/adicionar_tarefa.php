@@ -8,26 +8,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $responsavel_id = $_POST['responsavel_id'];
     $justificativa_funcionario = $_POST['comentario_gestor'] ?? null;
 
+    // Recebe tipo e ID juntos, separados por "_"
+    list($atribuido_para_tipo, $atribuido_para) = explode('_', $_POST['responsavel_id']);
     $criado_por = $_SESSION['usuario_id'];
-    $admin_id = $_SESSION['admin_id'];
-    $tipo_usuario = $_SESSION['tipo_usuario'];
+    $criado_por_tipo = $_SESSION['tipo_usuario'];
+    $descricao = trim($_POST['titulo_tarefa']);
+    $criticidade = $_POST['criticidade'];
+    $justificativa_funcionario = $_POST['comentario_gestor'] ?? null;
 
-    // Regras para definir se tarefa requer aprovação
     $aprovada = 'Sim';
-
     if (
-        $tipo_usuario === 'funcionario' &&
+        $criado_por_tipo === 'funcionario' &&
         $criticidade === 'Alta' &&
-        $responsavel_id != $criado_por
+        $atribuido_para != $criado_por
     ) {
         $aprovada = 'Pendente';
     }
 
-    $sql = "INSERT INTO tarefas (descricao, criticidade, status, criado_por, atribuido_para, equipe_id, aprovada, justificativa_funcionario)
-            VALUES (?, ?, 'Pendente', ?, ?, NULL, ?, ?)";
+
+    $sql = "INSERT INTO tarefas (
+                descricao, criticidade, status, criado_por, criado_por_tipo,
+                atribuido_para, atribuido_para_tipo, equipe_id, aprovada, justificativa_funcionario
+            ) VALUES (?, ?, 'Pendente', ?, ?, ?, ?, NULL, ?, ?)
+            ";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssiiss", $descricao, $criticidade, $criado_por, $responsavel_id, $aprovada, $justificativa_funcionario);
+    $stmt->bind_param(
+        "ssisssss",
+        $descricao,                // s
+        $criticidade,              // s
+        $criado_por,               // i
+        $criado_por_tipo,          // s
+        $atribuido_para,           // i
+        $atribuido_para_tipo,      // s
+        $aprovada,                 // s
+        $justificativa_funcionario // s
+    );
+
+
 
     if ($stmt->execute()) {
         header('Location:../../telas/tarefas.php?cadastro=sucesso');

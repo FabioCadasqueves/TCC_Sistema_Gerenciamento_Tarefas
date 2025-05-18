@@ -9,8 +9,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $tarefa_id = $_POST['tarefa_id'] ?? null;
 $titulo = trim($_POST['titulo_tarefa'] ?? '');
-$responsavel_id = $_POST['responsavel_id'] ?? null;
 $criticidade = $_POST['criticidade'] ?? '';
+$responsavel_id = $_POST['responsavel_id'] ?? null;
+
+// Quebra tipo e id
+list($atribuido_para_tipo, $atribuido_para) = explode('_', $responsavel_id);
 
 $valido = $tarefa_id && $titulo && $responsavel_id && in_array($criticidade, ['Baixa', 'Média', 'Alta']);
 
@@ -19,9 +22,15 @@ if (!$valido) {
     exit;
 }
 
-$sql = "UPDATE tarefas SET descricao = ?, atribuido_para = ?, criticidade = ? WHERE id = ?";
+// Se quiser garantir que o tipo está correto (opcional, mas recomendado)
+if (!in_array($atribuido_para_tipo, ['admin', 'funcionario'])) {
+    header('Location: ../../telas/tarefas.php?erro=tipo_invalido');
+    exit;
+}
+
+$sql = "UPDATE tarefas SET descricao = ?, atribuido_para = ?, atribuido_para_tipo = ?, criticidade = ? WHERE id = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("sisi", $titulo, $responsavel_id, $criticidade, $tarefa_id);
+$stmt->bind_param("sissi", $titulo, $atribuido_para, $atribuido_para_tipo, $criticidade, $tarefa_id);
 
 if ($stmt->execute()) {
     header('Location: ../../telas/tarefas.php?edicao=sucesso');
