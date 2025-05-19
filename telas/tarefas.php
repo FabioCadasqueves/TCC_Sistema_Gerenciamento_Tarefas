@@ -26,13 +26,18 @@ $filtro_usuario_id = $_GET['usuario_id']
 list($filtro_tipo, $filtro_id) = explode('_', $filtro_usuario_id);
 
 // Consulta tarefas filtradas, ordenadas por criticidade personalizada
-$ordenacaoCriticidade = "
+$statusFiltro = $_GET['status'] ?? 'Pendente';
+
+$ordenacaoCustomizada = "
+    CASE WHEN t.status = 'Em andamento' THEN 0 ELSE 1 END,
     CASE t.criticidade
         WHEN 'Alta' THEN 1
         WHEN 'Média' THEN 2
         WHEN 'Baixa' THEN 3
-    END ASC";
-
+        ELSE 4
+    END,
+    t.criado_em DESC
+";
 
 $sql = "SELECT t.*, 
             u.nome AS usuario_nome, 
@@ -40,12 +45,17 @@ $sql = "SELECT t.*,
         FROM tarefas t
         LEFT JOIN usuarios u ON u.id = t.atribuido_para AND t.atribuido_para_tipo = 'funcionario'
         LEFT JOIN admins a  ON a.id = t.atribuido_para AND t.atribuido_para_tipo = 'admin'
-        WHERE t.atribuido_para = ? AND t.atribuido_para_tipo = ?
-        ORDER BY $ordenacaoCriticidade, t.criado_em DESC";
+        WHERE t.atribuido_para = ? 
+          AND t.atribuido_para_tipo = ?
+          AND t.aprovada = 'Sim'
+          AND t.status = ?
+        ORDER BY $ordenacaoCustomizada";
+
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("is", $filtro_id, $filtro_tipo);
+$stmt->bind_param("iss", $filtro_id, $filtro_tipo, $statusFiltro);
 $stmt->execute();
 $resultado = $stmt->get_result();
+
 
 // Lista de usuários para o select
 $sql = "SELECT id, nome, funcao FROM usuarios 
@@ -89,7 +99,7 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
         <main class="container-fluid px-3" style="position: relative;">
             <?php if (isset($_GET['cadastro']) && $_GET['cadastro'] === 'sucesso'): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    ✅ Tarefa criada com sucesso!
+                    Tarefa criada com sucesso!
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
                 </div>
             <?php endif; ?>
@@ -113,8 +123,6 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
                                 <?php endforeach; ?>
                             </select>
 
-
-                            <!-- Botão Adicionar Tarefa permanece igual -->
                             <button class="btn btn-primary d-flex align-items-center gap-2" style="height: 40px;"
                                 data-bs-toggle="modal" data-bs-target="#modalAdicionarTarefa" title="Adicionar Tarefa">
                                 <i class="bi bi-plus-circle fs-4"></i>
@@ -125,8 +133,14 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
                 </div>
             </div>
 
-            <div class="d-none d-md-flex justify-content-end mb-3 mt-3">
-                <button class="btn btn-outline-secondary me-2 btn-visualizacao" onclick="mudarVisualizacao('grade', this)" title="Visualizar em grade">
+            <div class="d-none d-md-flex justify-content-end mb-3 mt-3 align-items-center gap-2">
+
+                <select class="form-select" id="filtroStatus" style="width: 160px;">
+                    <option value="Pendente" <?= (($_GET['status'] ?? 'Pendente') === 'Pendente') ? 'selected' : '' ?>>Pendentes</option>
+                    <option value="Em andamento" <?= (($_GET['status'] ?? '') === 'Em andamento') ? 'selected' : '' ?>>Em andamento</option>
+                    <option value="Concluída" <?= (($_GET['status'] ?? '') === 'Concluída') ? 'selected' : '' ?>>Concluídas</option>
+                </select>
+                <button class="btn btn-outline-secondary  btn-visualizacao" onclick="mudarVisualizacao('grade', this)" title="Visualizar em grade">
                     <i class="bi bi-grid-3x3-gap-fill"></i>
                 </button>
                 <button class="btn btn-outline-secondary btn-visualizacao" onclick="mudarVisualizacao('lista', this)" title="Visualizar em lista">
@@ -221,7 +235,9 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
                         <select class="form-select"
                             id="responsavel_id"
                             name="responsavel_id"
-                            required>
+                            required
+                            data-user-logado="<?= $_SESSION['usuario_id'] ?>"
+                            data-tipo-usuario="<?= $_SESSION['tipo_usuario'] ?>">
                             <option value="">Selecione o responsável</option>
                             <option value="<?= $_SESSION['tipo_usuario'] ?>_<?= $_SESSION['usuario_id'] ?>">Eu mesmo</option>
                             <?php while ($usuario = mysqli_fetch_assoc($resultadoUsuariosForm)): ?>
@@ -304,7 +320,9 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
                         <select class="form-select"
                             name="responsavel_id"
                             id="editar_responsavel_id"
-                            required>
+                            required
+                            data-user-logado="<?= $_SESSION['usuario_id'] ?>"
+                            data-tipo-usuario="<?= $_SESSION['tipo_usuario'] ?>">
                             <option value="">Selecione o responsável</option>
                             <option value="<?= $_SESSION['tipo_usuario'] ?>_<?= $_SESSION['usuario_id'] ?>">Eu mesmo</option>
                             <?php while ($usuario = mysqli_fetch_assoc($resultadoUsuariosEdit)): ?>
@@ -333,7 +351,7 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
                     </div>
 
                     <div class="alert alert-warning d-none" id="editar_alertaCriticidadeAlta">
-                        <strong>Atenção:</strong> Tarefas de alta criticidade só podem ser atribuídas a outro funcionário com aprovação do gestor.
+                        <strong>Atenção:</strong> Tarefas de alta criticidade exigem aprovação do gestor. Ao confirmar, será enviada uma solicitação para aprovação.
                     </div>
 
                     <div class="mb-3 d-none" id="editar_divComentarioGestor">
