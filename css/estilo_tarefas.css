@@ -128,3 +128,63 @@ body {
   height: 100%;
   overflow: hidden;
 }
+
+.tarefa-lista {
+  background-color: #fff;
+  transition: box-shadow 0.2s ease;
+}
+
+.tarefa-lista:hover {
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+}
+
+.tarefa-col {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .modo-grade .tarefa-col {
+    flex: 0 0 32%;
+    max-width: 32%;
+  }
+}
+
+.tarefa-lista .linha-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.tarefa-lista .badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.6em;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+#containerTarefas.modo-grade {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+#containerTarefas.modo-grade .col {
+  flex: 0 0 32%;
+  max-width: 32%;
+  min-width: 280px;
+  box-sizing: border-box;
+  display: flex;
+}
+
+#containerTarefas.modo-grade .tarefa-lista {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background-color: #fff;
+}

@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['tipo_usuario'] = 'funcionario';
 
         // Redireciona para dashboard ou tarefas
-        header('Location: ../../telas/dashboard.php');
+        header('Location: ../../telas/tarefas.php');
         exit;
     } else {
         // PIN incorreto ou usuário inativo

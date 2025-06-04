@@ -11,13 +11,13 @@
     </a>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item">
-            <a href="dashboard.php" class="nav-link text-white <?php if ($paginaAtual === 'dashboard') echo 'active'; ?>">
-                <i class="bi bi-speedometer2 me-2"></i> Dashboard
-            </a>
-        </li>
 
         <?php if ($_SESSION['tipo_usuario'] === 'admin'): ?>
+            <li class="nav-item">
+                <a href="dashboard.php" class="nav-link text-white <?php if ($paginaAtual === 'dashboard') echo 'active'; ?>">
+                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                </a>
+            </li>
             <li>
                 <a href="funcionarios.php" class="nav-link text-white <?php if ($paginaAtual === 'funcionarios') echo 'active'; ?>">
                     <i class="bi bi-person-badge-fill me-2"></i> Funcionários
@@ -50,7 +50,7 @@
     <div class="dropdown">
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
             data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+            <img src="../arquivos/imagens/User.jpg" alt="" width="32" height="32" class="rounded-circle me-2">
             <strong>
                 <?= $_SESSION['admin_nome'] ?? $_SESSION['nome_usuario'] ?? 'Usuário' ?>
             </strong>

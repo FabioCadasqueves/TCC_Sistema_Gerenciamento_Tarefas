@@ -9,6 +9,14 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
+if (
+    $_SESSION['tipo_usuario'] === 'admin' &&
+    (!isset($_GET['usuario_id']) || empty($_GET['usuario_id']))
+) {
+    header('Location: tarefas.php?usuario_id=todos');
+    exit;
+}
+
 $admin_id = $_SESSION['admin_id'];
 $usuario_id = $_SESSION['usuario_id'];
 $tipo_usuario = $_SESSION['tipo_usuario'];
@@ -22,14 +30,32 @@ $filtro_usuario_id = $_GET['usuario_id']
         : 'funcionario_' . $_SESSION['usuario_id']
     );
 
+if ($filtro_usuario_id === 'todos') {
+    $filtro_tipo = 'todos';
+    $filtro_id = null;
+} else {
+    list($filtro_tipo, $filtro_id) = explode('_', $filtro_usuario_id);
+}
 
-list($filtro_tipo, $filtro_id) = explode('_', $filtro_usuario_id);
 
 // Consulta tarefas filtradas, ordenadas por criticidade personalizada
-$statusFiltro = $_GET['status'] ?? 'Pendente';
+$statusFiltro = $_GET['status'] ?? 'todos';
+
+// Define o trecho do WHERE para o status
+if ($statusFiltro === 'todos') {
+    $statusWhere = "";  // Não filtra nada
+} else {
+    $statusWhere = "AND t.status = ?";
+}
+
 
 $ordenacaoCustomizada = "
-    CASE WHEN t.status = 'Em andamento' THEN 0 ELSE 1 END,
+    CASE t.status
+        WHEN 'Em andamento' THEN 0
+        WHEN 'Pendente' THEN 1
+        WHEN 'Concluída' THEN 2
+        ELSE 3
+    END,
     CASE t.criticidade
         WHEN 'Alta' THEN 1
         WHEN 'Média' THEN 2
@@ -39,22 +65,65 @@ $ordenacaoCustomizada = "
     t.criado_em DESC
 ";
 
-$sql = "SELECT t.*, 
-            u.nome AS usuario_nome, 
-            a.nome AS admin_nome
-        FROM tarefas t
-        LEFT JOIN usuarios u ON u.id = t.atribuido_para AND t.atribuido_para_tipo = 'funcionario'
-        LEFT JOIN admins a  ON a.id = t.atribuido_para AND t.atribuido_para_tipo = 'admin'
-        WHERE t.atribuido_para = ? 
-          AND t.atribuido_para_tipo = ?
-          AND t.aprovada = 'Sim'
-          AND t.status = ?
-        ORDER BY $ordenacaoCustomizada";
 
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("iss", $filtro_id, $filtro_tipo, $statusFiltro);
-$stmt->execute();
-$resultado = $stmt->get_result();
+
+$statusFiltro = $_GET['status'] ?? 'todos';
+
+if ($statusFiltro === 'todos') {
+    $statusWhere = "";  // Não filtra status
+} else {
+    $statusWhere = "AND t.status = ?";
+}
+
+// ADMIN visualizando todos
+if ($filtro_tipo === 'todos' && $tipo_usuario === 'admin') {
+    $sql = "SELECT t.*, 
+                u.nome AS usuario_nome, 
+                a.nome AS admin_nome
+            FROM tarefas t
+            LEFT JOIN usuarios u ON u.id = t.atribuido_para AND t.atribuido_para_tipo = 'funcionario'
+            LEFT JOIN admins a  ON a.id = t.atribuido_para AND t.atribuido_para_tipo = 'admin'
+            WHERE (
+                (t.atribuido_para IN (SELECT id FROM usuarios WHERE admin_id = ?) AND t.atribuido_para_tipo = 'funcionario')
+                OR (t.atribuido_para = ? AND t.atribuido_para_tipo = 'admin')
+            )
+            AND t.aprovada = 'Sim'
+            $statusWhere
+            ORDER BY $ordenacaoCustomizada";
+    if ($statusFiltro === 'todos') {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ii", $admin_id, $admin_id);
+    } else {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iis", $admin_id, $admin_id, $statusFiltro);
+    }
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+} else {
+    $sql = "SELECT t.*, 
+                u.nome AS usuario_nome, 
+                a.nome AS admin_nome
+            FROM tarefas t
+            LEFT JOIN usuarios u ON u.id = t.atribuido_para AND t.atribuido_para_tipo = 'funcionario'
+            LEFT JOIN admins a  ON a.id = t.atribuido_para AND t.atribuido_para_tipo = 'admin'
+            WHERE t.atribuido_para = ? 
+              AND t.atribuido_para_tipo = ?
+              AND t.aprovada = 'Sim'
+              $statusWhere
+            ORDER BY $ordenacaoCustomizada";
+    if ($statusFiltro === 'todos') {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("is", $filtro_id, $filtro_tipo);
+    } else {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iss", $filtro_id, $filtro_tipo, $statusFiltro);
+    }
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+}
+
+
+
 
 
 // Lista de usuários para o select
@@ -112,6 +181,9 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
                         </div>
                         <div class="d-flex gap-2 w-100 w-md-auto align-items-center">
                             <select class="form-select" id="filtroResponsavel">
+                                <?php if ($tipo_usuario === 'admin'): ?>
+                                    <option value="todos" <?= ($filtro_usuario_id == 'todos') ? 'selected' : '' ?>>Todos</option>
+                                <?php endif; ?>
                                 <option value="<?= $tipo_usuario === 'admin' ? 'admin' : 'funcionario' ?>_<?= $usuario_id ?>" <?= ($filtro_usuario_id == ($tipo_usuario === 'admin' ? 'admin' : 'funcionario') . '_' . $usuario_id) ? 'selected' : '' ?>>Minhas tarefas</option>
                                 <?php foreach ($usuariosPorFuncao as $funcao => $usuarios): ?>
                                     <optgroup label="<?= htmlspecialchars($funcao) ?>">
@@ -136,9 +208,10 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
             <div class="d-none d-md-flex justify-content-end mb-3 mt-3 align-items-center gap-2">
 
                 <select class="form-select" id="filtroStatus" style="width: 160px;">
-                    <option value="Pendente" <?= (($_GET['status'] ?? 'Pendente') === 'Pendente') ? 'selected' : '' ?>>Pendentes</option>
-                    <option value="Em andamento" <?= (($_GET['status'] ?? '') === 'Em andamento') ? 'selected' : '' ?>>Em andamento</option>
-                    <option value="Concluída" <?= (($_GET['status'] ?? '') === 'Concluída') ? 'selected' : '' ?>>Concluídas</option>
+                    <option value="todos" <?= (($_GET['status'] ?? 'todos') === 'todos') ? 'selected' : '' ?>>Todos</option>
+                    <option value="Pendente" <?= (($_GET['status'] ?? 'todos') === 'Pendente') ? 'selected' : '' ?>>Pendentes</option>
+                    <option value="Em andamento" <?= (($_GET['status'] ?? 'todos') === 'Em andamento') ? 'selected' : '' ?>>Em andamento</option>
+                    <option value="Concluída" <?= (($_GET['status'] ?? 'todos') === 'Concluída') ? 'selected' : '' ?>>Concluídas</option>
                 </select>
                 <button class="btn btn-outline-secondary  btn-visualizacao" onclick="mudarVisualizacao('grade', this)" title="Visualizar em grade">
                     <i class="bi bi-grid-3x3-gap-fill"></i>
@@ -151,48 +224,54 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
             <div id="containerTarefas" class="row modo-grade" style="max-height: calc(100vh - 150px); overflow-y: auto; padding-right: 2px;">
                 <?php while ($tarefa = $resultado->fetch_assoc()): ?>
                     <div class="col">
-                        <div class="tarefa-lista d-flex justify-content-between align-items-center py-3 px-2">
-                            <div class="info-bloco">
-                                <h6 class="mb-1 fw-semibold"><?= htmlspecialchars($tarefa['descricao']) ?></h6>
-                                <div class="small text-muted responsavel-linha">
-                                    <span>Criticidade: <strong><?= $tarefa['criticidade'] ?></strong></span>
-                                    <span class="responsavel">
-                                        Responsável: <?= htmlspecialchars($tarefa['usuario_nome'] ?? $tarefa['admin_nome'] ?? 'Não encontrado') ?>
-                                    </span>
+                        <div class="col">
+                            <div class="tarefa-lista d-flex justify-content-between align-items-start flex-wrap p-3 rounded border">
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-2"><?= htmlspecialchars($tarefa['descricao']) ?></h6>
+                                    <div class="d-flex flex-wrap gap-3 small">
+                                        <span class="text-muted"> <?= htmlspecialchars($tarefa['usuario_nome'] ?? $tarefa['admin_nome'] ?? 'Não encontrado') ?> </span>
+                                        <span class="badge <?= match ($tarefa['criticidade']) {
+                                                                'Alta' => 'bg-danger',
+                                                                'Média' => 'bg-warning text-dark',
+                                                                'Baixa' => 'bg-success',
+                                                                default => 'bg-secondary'
+                                                            } ?>">
+                                            <?= $tarefa['criticidade'] ?>
+                                        </span>
+                                        <?php
+                                        $statusClass = match ($tarefa['status']) {
+                                            'Em andamento' => 'bg-primary-subtle text-primary',
+                                            'Pendente'     => 'bg-danger-subtle text-danger',
+                                            'Concluída'    => 'bg-success-subtle text-success',
+                                            default        => 'bg-secondary-subtle text-secondary'
+                                        };
+                                        ?>
+                                        <span class="badge fw-semibold <?= $statusClass ?>"><?= $tarefa['status'] ?></span>
 
+                                    </div>
                                 </div>
-                                <div class="small mt-1">
-                                    Status: <span class="badge bg-secondary"><?= $tarefa['status'] ?></span>
+                                <div class="acoes-bloco d-flex gap-2 mt-2 mt-md-0">
+                                    <?php if ($tarefa['status'] === 'Pendente'): ?>
+                                        <button class="btn btn-sm btn-outline-primary iniciar-tarefa" data-id="<?= $tarefa['id'] ?>" title="Iniciar">
+                                            <i class="bi bi-play-fill"></i>
+                                        </button>
+                                    <?php elseif ($tarefa['status'] === 'Em andamento'): ?>
+                                        <button class="btn btn-sm btn-outline-success concluir-tarefa" data-id="<?= $tarefa['id'] ?>" title="Concluir">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                    <?php if ($tarefa['status'] !== 'Concluída'): ?>
+                                        <button class="btn btn-sm btn-outline-secondary editar-tarefa" data-id="<?= $tarefa['id'] ?>" title="Editar">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger excluir-tarefa" data-id="<?= $tarefa['id'] ?>" title="Excluir">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    <?php endif; ?>
                                 </div>
                             </div>
-
-                            <div class="acoes-bloco d-flex gap-2">
-                                <?php if ($tarefa['status'] === 'Pendente'): ?>
-                                    <!-- Botão Iniciar -->
-                                    <button class="btn btn-sm btn-outline-primary iniciar-tarefa" data-id="<?= $tarefa['id'] ?>" title="Iniciar">
-                                        <i class="bi bi-play-fill"></i>
-                                    </button>
-                                <?php elseif ($tarefa['status'] === 'Em andamento'): ?>
-                                    <!-- Botão Concluir -->
-                                    <button class="btn btn-sm btn-outline-success concluir-tarefa" data-id="<?= $tarefa['id'] ?>" title="Concluir">
-                                        <i class="bi bi-check-lg"></i>
-                                    </button>
-                                <?php endif; ?>
-
-                                <?php if ($tarefa['status'] !== 'Concluída'): ?>
-                                    <!-- Botão Editar -->
-                                    <button class="btn btn-sm btn-outline-secondary editar-tarefa" data-id="<?= $tarefa['id'] ?>" title="Editar">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                    <!-- Botão Excluir -->
-                                    <button class="btn btn-sm btn-outline-danger excluir-tarefa" data-id="<?= $tarefa['id'] ?>" title="Excluir">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                <?php endif; ?>
-                            </div>
-
                         </div>
-                        <hr class="my-0">
+
                     </div>
                 <?php endwhile; ?>
             </div>

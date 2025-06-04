@@ -74,7 +74,7 @@ $paginaAtual = 'dashboard';
 
             <!-- Gráficos -->
             <div class="row g-4">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title">Tarefas por Criticidade</h5>
@@ -86,7 +86,7 @@ $paginaAtual = 'dashboard';
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title">Tarefas por Equipe</h5>
-                            <canvas id="graficoEquipe" height="200"></canvas>
+                            <canvas id="graficoEquipe" height="190"></canvas>
                         </div>
                     </div>
                 </div>
