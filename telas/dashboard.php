@@ -9,6 +9,40 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['tipo_usuario'])) {
 
 // Define página atual
 $paginaAtual = 'dashboard';
+
+require_once '../conexao/conexao.php';
+
+$admin_id = $_SESSION['admin_id'];
+
+// Total de Tarefas
+$sqlTotal = "SELECT COUNT(*) AS total FROM tarefas WHERE criado_por = ? AND criado_por_tipo = 'admin'";
+$stmt = $conn->prepare($sqlTotal);
+$stmt->bind_param("i", $admin_id);
+$stmt->execute();
+$result = $stmt->get_result()->fetch_assoc();
+$totalTarefas = $result['total'];
+
+// Concluídas
+$sqlConcluidas = "SELECT COUNT(*) AS total FROM tarefas WHERE criado_por = ? AND criado_por_tipo = 'admin' AND status = 'Concluída'";
+$stmt = $conn->prepare($sqlConcluidas);
+$stmt->bind_param("i", $admin_id);
+$stmt->execute();
+$concluidas = $stmt->get_result()->fetch_assoc()['total'];
+
+// Em Andamento
+$sqlAndamento = "SELECT COUNT(*) AS total FROM tarefas WHERE criado_por = ? AND criado_por_tipo = 'admin' AND status = 'Em Andamento'";
+$stmt = $conn->prepare($sqlAndamento);
+$stmt->bind_param("i", $admin_id);
+$stmt->execute();
+$emAndamento = $stmt->get_result()->fetch_assoc()['total'];
+
+// Pendentes
+$sqlPendentes = "SELECT COUNT(*) AS total FROM tarefas WHERE criado_por = ? AND criado_por_tipo = 'admin' AND status = 'Pendente'";
+$stmt = $conn->prepare($sqlPendentes);
+$stmt->bind_param("i", $admin_id);
+$stmt->execute();
+$pendentes = $stmt->get_result()->fetch_assoc()['total'];
+
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +66,7 @@ $paginaAtual = 'dashboard';
         <main class="container py-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h3">
-                    <i></i>Dashbooard
+                    <i></i>Dashboard
                 </h1>
             </div>
 
@@ -42,7 +76,7 @@ $paginaAtual = 'dashboard';
                     <div class="card text-white bg-primary shadow-sm">
                         <div class="card-body">
                             <h6 class="card-title">Total de Tarefas</h6>
-                            <p class="h4">128</p>
+                            <p class="h4"><?= $totalTarefas ?></p>
                         </div>
                     </div>
                 </div>
@@ -50,7 +84,7 @@ $paginaAtual = 'dashboard';
                     <div class="card text-white bg-success shadow-sm">
                         <div class="card-body">
                             <h6 class="card-title">Concluídas</h6>
-                            <p class="h4">97</p>
+                            <p class="h4"><?= $concluidas ?></p>
                         </div>
                     </div>
                 </div>
@@ -58,7 +92,7 @@ $paginaAtual = 'dashboard';
                     <div class="card text-white bg-warning shadow-sm">
                         <div class="card-body">
                             <h6 class="card-title">Em Andamento</h6>
-                            <p class="h4">20</p>
+                            <p class="h4"><?= $emAndamento ?></p>
                         </div>
                     </div>
                 </div>
@@ -66,7 +100,7 @@ $paginaAtual = 'dashboard';
                     <div class="card text-white bg-danger shadow-sm">
                         <div class="card-body">
                             <h6 class="card-title">Pendentes</h6>
-                            <p class="h4">11</p>
+                            <p class="h4"><?= $pendentes ?></p>
                         </div>
                     </div>
                 </div>

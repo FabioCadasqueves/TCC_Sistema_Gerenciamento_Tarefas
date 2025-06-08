@@ -7,6 +7,17 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo_usuario'] !== 'admin') {
 $paginaAtual = 'solicitacoes';
 ?>
 
+<style>
+    .list-group-item {
+        transition: box-shadow 0.2s ease;
+    }
+
+    .list-group-item:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+    }
+</style>
+
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -63,28 +74,32 @@ $paginaAtual = 'solicitacoes';
 
                     <ul class="list-group">
                         <?php while ($tarefa = $resultado->fetch_assoc()): ?>
-                            <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 p-3 shadow-sm rounded-3 mb-1 border border-light-subtle">
-                                <div class="flex-grow-1">
-                                    <div class="fw-semibold text-primary">
-                                        Solicitação #<?= $tarefa['id'] ?> - <?= htmlspecialchars($tarefa['descricao']) ?>
+                            <li class="list-group-item bg-white rounded-3 border shadow-sm mb-1 px-4 py-3">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 fw-semibold text-primary">
+                                            <i class="bi bi-exclamation-triangle-fill me-1 text-danger"></i>
+                                            Solicitação - <?= htmlspecialchars($tarefa['descricao']) ?>
+                                        </h6>
+                                        <div class="small text-muted">
+                                            <div><i class="bi bi-person-circle me-1"></i>Solicitante: <?= htmlspecialchars($tarefa['solicitante_nome']) ?> - <?= $tarefa['solicitante_funcao'] ?></div>
+                                            <div><i class="bi bi-box-arrow-in-right me-1"></i>Sugerido para: <?= htmlspecialchars($tarefa['responsavel_nome']) ?> - <?= $tarefa['responsavel_funcao'] ?></div>
+                                        </div>
                                     </div>
-                                    <small class="text-muted d-block mt-1">
-                                        <i class="bi bi-person-circle me-1"></i>Solicitante: <?= htmlspecialchars($tarefa['solicitante_nome']) ?> - <?= $tarefa['solicitante_funcao'] ?><br>
-                                        <i class="bi bi-box-arrow-in-right me-1"></i>Sugerido para: <?= htmlspecialchars($tarefa['responsavel_nome']) ?> - <?= $tarefa['responsavel_funcao'] ?>
-                                    </small>
-                                </div>
-                                <div>
-                                    <button class="btn btn-outline-primary btn-sm avaliar-btn"
-                                        data-id="<?= $tarefa['id'] ?>"
-                                        data-descricao='<?= htmlspecialchars($tarefa['descricao'], ENT_QUOTES, "UTF-8") ?>'
-                                        data-criticidade='<?= htmlspecialchars($tarefa['criticidade'], ENT_QUOTES, "UTF-8") ?>'
-                                        data-responsavel-id="<?= htmlspecialchars($tarefa['atribuido_para'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-solicitante="<?= htmlspecialchars($tarefa['solicitante_nome'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-justificativa='<?= htmlspecialchars($tarefa['justificativa_funcionario'] ?? '', ENT_QUOTES, "UTF-8") ?>'>
-                                        Avaliar
-                                    </button>
+                                    <div class="mt-2 mt-md-0">
+                                        <button class="btn btn-sm btn-primary avaliar-btn"
+                                            data-id="<?= $tarefa['id'] ?>"
+                                            data-descricao='<?= htmlspecialchars($tarefa['descricao'], ENT_QUOTES, "UTF-8") ?>'
+                                            data-criticidade='<?= htmlspecialchars($tarefa['criticidade'], ENT_QUOTES, "UTF-8") ?>'
+                                            data-responsavel-id="<?= htmlspecialchars($tarefa['atribuido_para'], ENT_QUOTES, 'UTF-8') ?>'
+        data-solicitante=" <?= htmlspecialchars($tarefa['solicitante_nome'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-justificativa='<?= htmlspecialchars($tarefa['justificativa_funcionario'] ?? '', ENT_QUOTES, "UTF-8") ?>'>
+                                            <i class="bi bi-search me-1"></i> Avaliar
+                                        </button>
+                                    </div>
                                 </div>
                             </li>
+
                         <?php endwhile; ?>
                     </ul>
 

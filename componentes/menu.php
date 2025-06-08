@@ -1,4 +1,4 @@
-<div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px; height: 100vh;">
+<div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 250px; height: 100vh;">
 
     <!-- Botão de fechar (só visível no mobile) -->
     <div class="d-flex justify-content-end d-md-none mb-2">

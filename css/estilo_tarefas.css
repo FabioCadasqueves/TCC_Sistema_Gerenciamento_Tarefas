@@ -1,54 +1,219 @@
+/* =============================
+   ESTRUTURA GERAL DA PÁGINA
+============================= */
+
 /* Espaçamento no topo para o conteúdo não colidir com o menu mobile */
 main {
   padding-top: 1rem;
 }
 
-/* Destaque por criticidade */
-.card-tarefa.baixa {
-  border-left: 5px solid #198754; /* Verde */
-}
-.card-tarefa.media {
-  border-left: 5px solid #ffc107; /* Amarelo */
-}
-.card-tarefa.alta {
-  border-left: 5px solid #dc3545; /* Vermelho */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
 }
 
-/* Efeito hover nos cards */
-.card-tarefa:hover {
-  transform: translateY(-3px);
-  transition: 0.2s ease-in-out;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
+/* =============================
+   VISUALIZAÇÃO: MODO GRADE
+============================= */
 
-/* Ajuste nos botões de ação */
-.card-body .btn {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
-}
-
-/* Estilo mais moderno para os selects */
-select.form-select {
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-}
-
-/* Botão de visualização ativo */
-.btn-visualizacao.active {
-  background-color: #0d6efd;
-  color: white;
-  border-color: #0d6efd;
-}
-
-/* --- VISUALIZAÇÃO EM GRADE --- */
 .modo-grade {
   row-gap: 1.5rem;
 }
 
-/* --- VISUALIZAÇÃO EM LISTA (ESTILO CLÁSSICO COM SEPARADOR) --- */
-.modo-lista .col {
-  max-width: 100%;
-  flex: 1 1 100%;
+#containerTarefas.modo-grade {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+#containerTarefas.modo-grade .tarefa-col {
+  flex: 1 1 calc(33.333% - 1rem);
+  max-width: calc(33.333% - 1rem);
+  min-width: 280px;
+  display: flex;
+}
+
+/* Reforça para md+ telas o uso de 3 colunas */
+@media (min-width: 768px) {
+  .modo-grade .tarefa-col {
+    flex: 0 0 32%;
+    max-width: 32%;
+  }
+}
+
+/* Estilo base da tarefa em grade */
+#containerTarefas.modo-grade .tarefa-lista {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background-color: #fff;
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s;
+}
+
+/* Estilo mais bonito tipo cartão */
+#containerTarefas.modo-grade .modo-grade-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 1.25rem;
+  height: 100%;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  gap: 0.75rem;
+}
+
+#containerTarefas.modo-grade .modo-grade-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+}
+
+/* Título */
+.modo-grade-card h6 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+}
+
+/* Criticidade */
+.modo-grade-card .badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.6em;
+  width: fit-content;
+}
+
+/* Linha com status e usuário */
+.modo-grade-card .linha-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+/* Ações alinhadas embaixo */
+.modo-grade-card .acoes-bloco {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+/* Badge de status */
+.modo-grade-card .status-badge {
+  min-width: 90px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+/* Bordas laterais por criticidade */
+.card-tarefa.baixa {
+  border-left: 6px solid #198754;
+}
+.card-tarefa.media {
+  border-left: 6px solid #ffc107;
+}
+.card-tarefa.alta {
+  border-left: 6px solid #dc3545;
+}
+
+#containerTarefas.modo-grade .modo-grade-card {
+  min-height: 200px; /* ou outro valor adequado */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.modo-grade-card .acoes-bloco-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+/* Botões agrupados com espaçamento */
+.modo-grade-card .acoes-bloco {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* =============================
+   VISUALIZAÇÃO: MODO LISTA
+============================= */
+
+.modo-lista .tarefa-lista {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  padding: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  justify-content: space-between;
+}
+
+/* Torna o título truncável para caber na linha */
+.modo-lista .tarefa-lista h6 {
+  margin: 0;
+  font-weight: 600;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Ajusta criticidade e status para manter-se inline */
+.modo-lista .tarefa-lista .badge,
+.modo-lista .tarefa-lista .responsavel {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Força as ações para o fim da linha */
+.modo-lista .acoes-bloco-container {
+  margin-left: auto;
+}
+
+/* Remove margem automática que alinha botões para base no modo grade */
+.modo-lista .acoes-bloco-container {
+  margin-top: 0 !important;
+}
+
+/* Modo lista: tudo em linha, lado a lado */
+.modo-lista .acoes-bloco-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-left: auto;
+  margin-top: 0 !important;
+}
+
+/* Evita que badges e nome quebrem */
+.modo-lista .status-badge,
+.modo-lista .responsavel {
+  white-space: nowrap;
+}
+
+/* =============================
+   COMPONENTE: TAREFA
+============================= */
+
+.tarefa-col {
+  width: 100%;
 }
 
 .tarefa-lista {
@@ -58,6 +223,7 @@ select.form-select {
   padding: 0.75rem 1rem;
   margin-bottom: 0.5rem;
   transition: border-color 0.2s, background-color 0.2s;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
 }
 
 .tarefa-lista:hover {
@@ -65,88 +231,9 @@ select.form-select {
   border-color: #cbd5e1;
 }
 
-.tarefa-lista:hover {
-  background-color: #f8f9fa;
-}
-
 .tarefa-lista h6 {
   font-size: 1rem;
   font-weight: 600;
-}
-
-.tarefa-lista .badge {
-  font-size: 0.75rem;
-  padding: 0.35em 0.6em;
-}
-
-.tarefa-lista .acoes-bloco .btn {
-  height: 2rem;
-  width: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  font-size: 0.85rem;
-  border-radius: 0.4rem;
-}
-
-/* Separador entre tarefas */
-.modo-lista .col + .col hr {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
-  color: #dee2e6;
-}
-
-/* Responsividade para telas pequenas */
-@media (max-width: 576px) {
-  #containerTarefas .card-body {
-    padding: 1rem;
-  }
-
-  .card-title {
-    font-size: 1rem;
-  }
-
-  .card-text {
-    font-size: 0.875rem;
-  }
-}
-/* Em mobile, quebra o texto do responsável para a linha de baixo */
-@media (max-width: 576px) {
-  .responsavel-linha {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .responsavel-linha .responsavel {
-    margin-left: 0; /* remove alinhamento lateral */
-  }
-}
-html,
-body {
-  height: 100%;
-  overflow: hidden;
-}
-
-.tarefa-lista {
-  background-color: #fff;
-  transition: box-shadow 0.2s ease;
-}
-
-.tarefa-lista:hover {
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
-}
-
-.tarefa-col {
-  width: 100%;
-}
-
-@media (min-width: 768px) {
-  .modo-grade .tarefa-col {
-    flex: 0 0 32%;
-    max-width: 32%;
-  }
 }
 
 .tarefa-lista .linha-badges {
@@ -163,28 +250,199 @@ body {
   line-height: 1.2;
 }
 
-#containerTarefas.modo-grade {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+/* Padroniza a largura dos badges de criticidade */
+.tarefa-lista .badge-criticidade {
+  display: inline-block;
+  width: 80px;
+  text-align: center;
+  font-size: 0.75rem;
+  padding: 0.35em 0.6em;
 }
 
-#containerTarefas.modo-grade .col {
-  flex: 0 0 32%;
-  max-width: 32%;
-  min-width: 280px;
-  box-sizing: border-box;
-  display: flex;
+.status-badge {
+  min-width: 100px;
+  display: inline-block;
 }
 
-#containerTarefas.modo-grade .tarefa-lista {
-  flex-grow: 1;
+.criticidade-col {
+  text-align: center;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  border: 1px solid #dee2e6;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Estilo da descrição da tarefa */
+.descricao-container {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  max-width: 100%;
+}
+
+.descricao-tarefa {
+  display: inline-block;
+  white-space: nowrap;
+  word-break: break-word; /* ajuda a evitar quebra dentro de acentos e ligações */
+  font-weight: 600;
+  font-size: 1rem;
+  color: #212529;
+}
+
+/* =============================
+   BOTÕES DE AÇÃO
+============================= */
+
+.tarefa-lista .acoes-bloco {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tarefa-lista .acoes-bloco .btn {
+  height: 2.2rem;
+  width: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 1rem;
   border-radius: 0.5rem;
-  padding: 1rem;
-  background-color: #fff;
+  border: none;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.tarefa-lista .acoes-bloco .btn:hover {
+  opacity: 0.9;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+}
+
+/* Botões customizados modernos */
+
+.btn-acao {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-acao:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-verde {
+  background-color: #d1e7dd;
+  color: #198754;
+}
+.btn-verde:hover {
+  background-color: #bcd0c7;
+}
+
+.btn-vermelho {
+  background-color: #f8d7da;
+  color: #dc3545;
+}
+.btn-vermelho:hover {
+  background-color: #f1bfc4;
+}
+
+.btn-azul {
+  background-color: #cfe2ff;
+  color: #0d6efd;
+}
+.btn-azul:hover {
+  background-color: #b2d1ff;
+}
+
+.btn-cinza {
+  background-color: #e2e3e5;
+  color: #6c757d;
+}
+.btn-cinza:hover {
+  background-color: #ced0d2;
+}
+
+/* =============================
+   ESTILOS AUXILIARES GERAIS
+============================= */
+
+/* Destaque por criticidade */
+.card-tarefa.baixa {
+  border-left: 5px solid #198754;
+}
+.card-tarefa.media {
+  border-left: 5px solid #ffc107;
+}
+.card-tarefa.alta {
+  border-left: 5px solid #dc3545;
+}
+
+/* Efeito hover em cards */
+.card-tarefa:hover {
+  transform: translateY(-3px);
+  transition: 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Ajuste nos botões genéricos (dentro de card-body) */
+.card-body .btn {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Selects estilizados */
+select.form-select {
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+/* Botão de visualização ativo */
+.btn-visualizacao.active {
+  background-color: #0d6efd;
+  color: white;
+  border-color: #0d6efd;
+}
+
+/* =============================
+   RESPONSIVIDADE
+============================= */
+
+@media (max-width: 576px) {
+  #containerTarefas .card-body {
+    padding: 1rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-text {
+    font-size: 0.875rem;
+  }
+
+  .responsavel-linha {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .responsavel-linha .responsavel {
+    margin-left: 0;
+  }
+}
+
+#containerTarefas {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE e Edge antigos */
+}
+
+#containerTarefas::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }

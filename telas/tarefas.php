@@ -179,7 +179,7 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
                         <div class="w-100 w-md-auto">
                             <h1 class="h4 mb-0">Tarefas</h1>
                         </div>
-                        <div class="d-flex gap-2 w-100 w-md-auto align-items-center">
+                        <div class="d-flex gap-2 w-50 w-md-auto align-items-center">
                             <select class="form-select" id="filtroResponsavel">
                                 <?php if ($tipo_usuario === 'admin'): ?>
                                     <option value="todos" <?= ($filtro_usuario_id == 'todos') ? 'selected' : '' ?>>Todos</option>
@@ -223,55 +223,78 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
 
             <div id="containerTarefas" class="row modo-grade" style="max-height: calc(100vh - 150px); overflow-y: auto; padding-right: 2px;">
                 <?php while ($tarefa = $resultado->fetch_assoc()): ?>
-                    <div class="col">
-                        <div class="col">
-                            <div class="tarefa-lista d-flex justify-content-between align-items-start flex-wrap p-3 rounded border">
-                                <div class="flex-grow-1">
-                                    <h6 class="fw-bold mb-2"><?= htmlspecialchars($tarefa['descricao']) ?></h6>
-                                    <div class="d-flex flex-wrap gap-3 small">
-                                        <span class="text-muted"> <?= htmlspecialchars($tarefa['usuario_nome'] ?? $tarefa['admin_nome'] ?? 'Não encontrado') ?> </span>
-                                        <span class="badge <?= match ($tarefa['criticidade']) {
-                                                                'Alta' => 'bg-danger',
-                                                                'Média' => 'bg-warning text-dark',
-                                                                'Baixa' => 'bg-success',
-                                                                default => 'bg-secondary'
-                                                            } ?>">
-                                            <?= $tarefa['criticidade'] ?>
-                                        </span>
-                                        <?php
-                                        $statusClass = match ($tarefa['status']) {
-                                            'Em andamento' => 'bg-primary-subtle text-primary',
-                                            'Pendente'     => 'bg-danger-subtle text-danger',
-                                            'Concluída'    => 'bg-success-subtle text-success',
-                                            default        => 'bg-secondary-subtle text-secondary'
-                                        };
-                                        ?>
-                                        <span class="badge fw-semibold <?= $statusClass ?>"><?= $tarefa['status'] ?></span>
 
-                                    </div>
-                                </div>
-                                <div class="acoes-bloco d-flex gap-2 mt-2 mt-md-0">
+                    <div class="tarefa-col">
+                        <?php
+                        if (!function_exists('removerAcentos')) {
+                            function removerAcentos($texto)
+                            {
+                                return preg_replace(
+                                    ['/[áàãâä]/u', '/[éèêë]/u', '/[íìîï]/u', '/[óòõôö]/u', '/[úùûü]/u', '/[ç]/u'],
+                                    ['a', 'e', 'i', 'o', 'u', 'c'],
+                                    strtolower($texto)
+                                );
+                            }
+                        }
+                        ?>
+
+                        <div class="tarefa-lista card-tarefa <?= removerAcentos($tarefa['criticidade']) ?>" data-tarefa>
+
+
+                            <!-- Criticidade -->
+                            <span class="badge mb-2 <?= match ($tarefa['criticidade']) {
+                                                        'Alta' => 'bg-danger',
+                                                        'Média' => 'bg-warning text-dark',
+                                                        'Baixa' => 'bg-success',
+                                                        default => 'bg-secondary'
+                                                    } ?>">
+                                <?= $tarefa['criticidade'] ?>
+                            </span>
+
+                            <!-- Título -->
+                            <h6 class="fw-bold"><?= htmlspecialchars($tarefa['descricao']) ?></h6>
+
+                            <!-- Status e responsável -->
+                            <div class="linha-badges ">
+                                <?php
+                                $statusClass = match ($tarefa['status']) {
+                                    'Em andamento' => 'bg-primary-subtle text-primary',
+                                    'Pendente'     => 'bg-danger-subtle text-danger',
+                                    'Concluída'    => 'bg-success-subtle text-success',
+                                    default        => 'bg-secondary-subtle text-secondary'
+                                };
+                                ?>
+                            </div>
+
+                            <!-- Ações + status + nome em uma única linha -->
+                            <div class="acoes-bloco-container d-flex align-items-center ms-auto gap-4">
+                                <span class="badge status-badge <?= $statusClass ?>"><?= $tarefa['status'] ?></span>
+                                <span class="responsavel"><?= htmlspecialchars($tarefa['usuario_nome'] ?? $tarefa['admin_nome'] ?? 'Não encontrado') ?></span>
+
+                                <div class="acoes-bloco d-flex gap-2">
                                     <?php if ($tarefa['status'] === 'Pendente'): ?>
-                                        <button class="btn btn-sm btn-outline-primary iniciar-tarefa" data-id="<?= $tarefa['id'] ?>" title="Iniciar">
+                                        <button class="btn-acao btn-azul iniciar-tarefa" data-id="<?= $tarefa['id'] ?>" title="Iniciar">
                                             <i class="bi bi-play-fill"></i>
                                         </button>
                                     <?php elseif ($tarefa['status'] === 'Em andamento'): ?>
-                                        <button class="btn btn-sm btn-outline-success concluir-tarefa" data-id="<?= $tarefa['id'] ?>" title="Concluir">
+                                        <button class="btn-acao btn-verde concluir-tarefa" data-id="<?= $tarefa['id'] ?>" title="Concluir">
                                             <i class="bi bi-check-lg"></i>
                                         </button>
                                     <?php endif; ?>
+
                                     <?php if ($tarefa['status'] !== 'Concluída'): ?>
-                                        <button class="btn btn-sm btn-outline-secondary editar-tarefa" data-id="<?= $tarefa['id'] ?>" title="Editar">
+                                        <button class="btn-acao btn-cinza editar-tarefa" data-id="<?= $tarefa['id'] ?>" title="Editar">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-danger excluir-tarefa" data-id="<?= $tarefa['id'] ?>" title="Excluir">
+                                        <button class="btn-acao btn-vermelho excluir-tarefa" data-id="<?= $tarefa['id'] ?>" title="Excluir">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     <?php endif; ?>
                                 </div>
                             </div>
-                        </div>
 
+
+                        </div>
                     </div>
                 <?php endwhile; ?>
             </div>
