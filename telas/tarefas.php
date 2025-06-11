@@ -156,6 +156,7 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
 
     <link rel="stylesheet" href="../css/estilo_menu.css">
     <link rel="stylesheet" href="../css/estilo_tarefas.css">
+    <link rel="stylesheet" href="../css/estilo_titulo_paginas.css">
     <?php include '../componentes/bootstrap_refs.php'; ?>
 </head>
 
@@ -165,7 +166,7 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
     <div class="d-md-flex">
         <?php include '../componentes/menu.php'; ?>
 
-        <main class="container-fluid px-3" style="position: relative;">
+        <main class="container py-4" style="max-width: 1200px;">
             <?php if (isset($_GET['cadastro']) && $_GET['cadastro'] === 'sucesso'): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     Tarefa criada com sucesso!
@@ -174,10 +175,10 @@ while ($usuario = $resultadoUsuarios->fetch_assoc()) {
             <?php endif; ?>
 
             <div class="sticky-top bg-white border-bottom" style="z-index: 1020;">
-                <div class="container-fluid px-0 py-3">
+                <div class="container-fluid px-0 py-1">
                     <div class="d-flex justify-content-between align-items-center flex-column flex-md-row gap-3">
                         <div class="w-100 w-md-auto">
-                            <h1 class="h4 mb-0">Tarefas</h1>
+                            <h1 class="titulo-pagina">Tarefas</h1>
                         </div>
                         <div class="d-flex gap-2 w-50 w-md-auto align-items-center">
                             <select class="form-select" id="filtroResponsavel">

@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $admin_id = $_SESSION['admin_id'];
 
     // Gerar PIN aleatório de 6 dígitos
-    $pin = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+    $pin = $_POST['pin'];
 
     // Inserir funcionário
     $stmt = $conn->prepare("INSERT INTO usuarios (nome, funcao, pin, admin_id) VALUES (?, ?, ?, ?)");

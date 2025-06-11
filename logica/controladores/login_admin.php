@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['usuario_id'] = $admin_id;
             $_SESSION['admin_nome'] = $admin_nome;
             $_SESSION['tipo_usuario'] = 'admin';
-            header('Location: ../../telas/dashboard.php');
+            header('Location: ../../telas/tarefas.php');
             exit;
         } else {
             // Senha incorreta

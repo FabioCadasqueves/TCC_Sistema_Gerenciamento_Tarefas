@@ -1,5 +1,7 @@
-// Gera um PIN numérico aleatório de 4 a 6 dígitos
-function gerarPIN(tamanho = 4) {
+// ===============================
+// Geração de PIN numérico
+// ===============================
+function gerarPIN(tamanho = 6) {
   let pin = "";
   for (let i = 0; i < tamanho; i++) {
     pin += Math.floor(Math.random() * 10);
@@ -7,18 +9,24 @@ function gerarPIN(tamanho = 4) {
   return pin;
 }
 
-// Ao abrir modal de novo funcionário, preenche o PIN
-const modalNovoFuncionario = document.getElementById("modalNovoFuncionario");
-if (modalNovoFuncionario) {
-  modalNovoFuncionario.addEventListener("show.bs.modal", function () {
-    const campoPin = document.getElementById("pinFuncionario");
-    if (campoPin) campoPin.value = gerarPIN(4);
-  });
-}
-
-// Espera o DOM estar carregado para aplicar listeners
+// ===============================
+// Espera o DOM carregar para aplicar os listeners
+// ===============================
 document.addEventListener("DOMContentLoaded", function () {
+  // ===============================
+  // Preenche PIN ao abrir modal de novo funcionário
+  // ===============================
+  const modalNovoFuncionario = document.getElementById("modalNovoFuncionario");
+  if (modalNovoFuncionario) {
+    modalNovoFuncionario.addEventListener("show.bs.modal", function () {
+      const campoPin = document.getElementById("pinFuncionario");
+      if (campoPin) campoPin.value = gerarPIN(6);
+    });
+  }
+
+  // ===============================
   // Botão de copiar PIN no modal de adicionar
+  // ===============================
   const btnCopiar = document.getElementById("copiarPin");
   const mensagem = document.getElementById("mensagemCopiado");
   if (btnCopiar && mensagem) {
@@ -33,7 +41,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Edição de funcionário – copiar
+  // ===============================
+  // Edição de funcionário – copiar PIN
+  // ===============================
   const btnCopiarEditar = document.getElementById("btnCopiarPinEditar");
   const campoEditarPin = document.getElementById("editarPinFuncionario");
   const feedbackEditar = document.getElementById("feedbackPin");
@@ -48,7 +58,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Edição de funcionário – mostrar/ocultar
+  // ===============================
+  // Edição de funcionário – mostrar/ocultar PIN
+  // ===============================
   const btnMostrarPin = document.getElementById("btnMostrarPin");
   if (btnMostrarPin && campoEditarPin) {
     btnMostrarPin.addEventListener("click", function () {
@@ -62,28 +74,47 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   }
-});
 
-document.querySelectorAll(".btn-editar-funcionario").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    document.getElementById("editarIdFuncionario").value = btn.dataset.id;
-    document.getElementById("editarNomeFuncionario").value = btn.dataset.nome;
-    document.getElementById("editarFuncaoFuncionario").value =
-      btn.dataset.funcao;
-    document.getElementById("editarPinFuncionario").value = btn.dataset.pin;
+  // ===============================
+  // Preenche modal de edição de funcionário
+  // ===============================
+  document.querySelectorAll(".btn-editar-funcionario").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      const nome = btn.dataset.nome;
+      const funcao = btn.dataset.funcao;
+      const pin = btn.dataset.pin;
+
+      const inputId = document.getElementById("editarIdFuncionario");
+      const inputNome = document.getElementById("editarNomeFuncionario");
+      const inputFuncao = document.getElementById("editarFuncaoFuncionario");
+      const inputPin = document.getElementById("editarPinFuncionario");
+
+      if (inputId) inputId.value = id;
+      if (inputNome) inputNome.value = nome;
+      if (inputFuncao) inputFuncao.value = funcao;
+      if (inputPin) inputPin.value = pin;
+    });
   });
-});
 
-document.querySelectorAll(".btn-excluir-funcionario").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    document.getElementById("excluirIdFuncionario").value = btn.dataset.id;
+  // ===============================
+  // Preenche modal de exclusão de funcionário
+  // ===============================
+  document.querySelectorAll(".btn-excluir-funcionario").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const inputExcluir = document.getElementById("excluirIdFuncionario");
+      if (inputExcluir) inputExcluir.value = btn.dataset.id;
+    });
   });
-});
 
-setTimeout(() => {
-  const alert = document.getElementById("alert-overlay");
-  if (alert) {
-    const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-    bsAlert.close();
-  }
-}, 4000); // 4 segundos
+  // ===============================
+  // Fecha alertas automaticamente após 4 segundos
+  // ===============================
+  setTimeout(() => {
+    const alert = document.getElementById("alert-overlay");
+    if (alert) {
+      const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+      bsAlert.close();
+    }
+  }, 4000);
+});

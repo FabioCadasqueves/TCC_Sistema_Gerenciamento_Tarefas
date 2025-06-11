@@ -5,19 +5,22 @@
         <button class="btn btn-close btn-close-white" onclick="fecharMenu()" aria-label="Fechar"></button>
     </div>
 
-    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-        <img src="../arquivos/imagens/Logo.png" alt="Logo SIGTO" width="32" height="32">
-        <span class="fs-4 ms-2">SGTO</span>
-    </a>
+    <div class="d-flex justify-content-center">
+        <a href="/" class="d-flex align-items-center text-white text-decoration-none">
+            <img src="../arquivos/imagens/Logo.png" alt="Logo SIGTO" width="32" height="32">
+            <span class="fs-4 ms-2">SGTO</span>
+        </a>
+    </div>
+
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
 
         <?php if ($_SESSION['tipo_usuario'] === 'admin'): ?>
-            <li class="nav-item">
+            <!--<li class="nav-item">
                 <a href="dashboard.php" class="nav-link text-white <?php if ($paginaAtual === 'dashboard') echo 'active'; ?>">
                     <i class="bi bi-speedometer2 me-2"></i> Dashboard
                 </a>
-            </li>
+            </li>-->
             <li>
                 <a href="funcionarios.php" class="nav-link text-white <?php if ($paginaAtual === 'funcionarios') echo 'active'; ?>">
                     <i class="bi bi-person-badge-fill me-2"></i> Funcionários

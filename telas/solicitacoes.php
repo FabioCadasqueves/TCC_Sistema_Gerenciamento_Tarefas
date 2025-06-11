@@ -28,6 +28,7 @@ $paginaAtual = 'solicitacoes';
     <link rel="stylesheet" href="../css/estilo_menu.css">
     <?php include '../componentes/bootstrap_refs.php'; ?>
     <link rel="stylesheet" href="../css/estilo_funcionario.css">
+    <link rel="stylesheet" href="../css/estilo_titulo_paginas.css">
     <style>
         .list-group-item+.list-group-item {
             margin-top: 1rem;
@@ -41,9 +42,9 @@ $paginaAtual = 'solicitacoes';
     <div class="d-md-flex">
         <?php include '../componentes/menu.php'; ?>
 
-        <main class="container py-4">
+        <main class="container py-4" style="max-width: 1200px;">
             <div class="d-flex justify-content-between align-items-center mb-4" style="padding-bottom: 15px">
-                <h1 class="h3">Solicitações de Tarefas Críticas</h1>
+                <h1 class="titulo-pagina">Solicitações de Tarefas Críticas</h1>
             </div>
 
             <div style="max-height: 100vh; overflow-y: auto;" class="custom-scrollbar">
@@ -89,13 +90,14 @@ $paginaAtual = 'solicitacoes';
                                     <div class="mt-2 mt-md-0">
                                         <button class="btn btn-sm btn-primary avaliar-btn"
                                             data-id="<?= $tarefa['id'] ?>"
-                                            data-descricao='<?= htmlspecialchars($tarefa['descricao'], ENT_QUOTES, "UTF-8") ?>'
-                                            data-criticidade='<?= htmlspecialchars($tarefa['criticidade'], ENT_QUOTES, "UTF-8") ?>'
-                                            data-responsavel-id="<?= htmlspecialchars($tarefa['atribuido_para'], ENT_QUOTES, 'UTF-8') ?>'
-        data-solicitante=" <?= htmlspecialchars($tarefa['solicitante_nome'], ENT_QUOTES, 'UTF-8') ?>"
-                                            data-justificativa='<?= htmlspecialchars($tarefa['justificativa_funcionario'] ?? '', ENT_QUOTES, "UTF-8") ?>'>
+                                            data-descricao="<?= htmlspecialchars($tarefa['descricao'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-criticidade="<?= htmlspecialchars($tarefa['criticidade'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-responsavel-id="<?= htmlspecialchars($tarefa['atribuido_para'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-solicitante="<?= htmlspecialchars($tarefa['solicitante_nome'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-justificativa="<?= htmlspecialchars($tarefa['justificativa_funcionario'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                                             <i class="bi bi-search me-1"></i> Avaliar
                                         </button>
+
                                     </div>
                                 </div>
                             </li>
